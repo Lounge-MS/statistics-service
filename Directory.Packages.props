@@ -11,6 +11,7 @@
     <PackageVersion Include="FluentMigrator" Version="8.0.0" />
     <PackageVersion Include="FluentMigrator.Runner.Postgres" Version="8.0.0" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageVersion Include="Npgsql" Version="10.0.1" />
     <PackageVersion Include="SourceKit.Analyzers.Collections" Version="1.0.50" />
     <PackageVersion Include="SourceKit.Analyzers.Enumerable" Version="1.0.50" />
     <PackageVersion Include="SourceKit.Analyzers.MemberAccessibility" Version="1.0.31" />

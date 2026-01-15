@@ -6,13 +6,13 @@
         <RootNamespace>StatisticsServiceProject</RootNamespace>
     </PropertyGroup>
     <ItemGroup>
-      <Folder Include="Domain\Services\" />
-      <Folder Include="Infrastructure\Driven\Repositories\" />
-      <Folder Include="Infrastructure\Driving\Controllers\Grpc\" />
+      <Folder Include="Infrastructure\Driving\Grpc\Controllers\" />
+      <Folder Include="Infrastructure\Driving\Kafka\" />
       <Folder Include="Protos\" />
     </ItemGroup>
     <ItemGroup>
       <PackageReference Include="FluentMigrator" />
       <PackageReference Include="FluentMigrator.Runner.Postgres" />
+      <PackageReference Include="Npgsql" />
     </ItemGroup>
 </Project>
