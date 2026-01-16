@@ -51,12 +51,6 @@ services:
       - statistics-kafka-data:/kafka-data
     ports:
       - '8092:9092'
-    healthcheck:
-      test: [ "CMD-SHELL", "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9094 --topic OrderPaidEvent --describe > /dev/null 2>&1" ]
-      interval: 5s
-      timeout: 3s
-      retries: 5
-      start_period: 20s
 
   statistics-kafka-ui:
     container_name: statistics-kafka-ui
@@ -97,7 +91,7 @@ services:
       statistics-postgres:
         condition: service_healthy
       statistics-kafka:
-        condition: service_healthy
+        condition: service_started
     environment:
       POSTGRES_CONNECTION_STRING: "Host=statistics-postgres;Port=5432;Database=postgres;Username=postgres;Password=postgres"
       Kafka__Host: "statistics-kafka:9094"
