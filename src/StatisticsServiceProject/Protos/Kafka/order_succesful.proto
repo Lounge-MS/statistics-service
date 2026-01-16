@@ -14,6 +14,6 @@ message OrderSuccessfulKey {
 }
 
 message OrderSuccessfulValue {
-  double OrderPrice = 2;
   repeated Item order_items = 1;
+  double order_price = 2;
 }

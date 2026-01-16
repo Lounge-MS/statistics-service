@@ -8,6 +8,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageVersion>
+    <PackageVersion Include="DotNetEnv" Version="3.1.1" />
     <PackageVersion Include="FluentMigrator" Version="8.0.0" />
     <PackageVersion Include="FluentMigrator.Runner.Postgres" Version="8.0.0" />
     <PackageVersion Include="Google.Protobuf" Version="3.33.4" />

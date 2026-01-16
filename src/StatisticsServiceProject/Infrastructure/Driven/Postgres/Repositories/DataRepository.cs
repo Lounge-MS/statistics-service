@@ -32,7 +32,7 @@ public class DataRepository : IDataRepository
             VALUES(:data_type, :value, :metainfo, :timestamp)
             """;
 
-        command.Parameters.AddWithValue("data_type", dataType);
+        command.Parameters.AddWithValue("data_type", dataType.ToString());
         command.Parameters.AddWithValue("value", value);
         command.Parameters.AddWithValue("metainfo", NpgsqlDbType.Jsonb, JsonConvert.SerializeObject(metainfo));
         command.Parameters.AddWithValue("timestamp", timestamp);

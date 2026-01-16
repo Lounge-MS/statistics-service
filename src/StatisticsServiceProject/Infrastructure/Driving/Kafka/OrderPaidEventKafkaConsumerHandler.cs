@@ -5,12 +5,12 @@ using StatisticsServiceProject.Domain.Ports.Services;
 
 namespace StatisticsServiceProject.Infrastructure.Driving.Kafka;
 
-public class OrderPaidEventConsumerKafkaConsumerHandler
+public class OrderPaidEventKafkaConsumerHandler
     : IKafkaConsumerHandler<OrderSuccessfulKey, OrderSuccessfulValue>
 {
     private readonly IStatisticsWriter _statisticsWriter;
 
-    public OrderPaidEventConsumerKafkaConsumerHandler(
+    public OrderPaidEventKafkaConsumerHandler(
         IStatisticsWriter statisticsWriter)
     {
         _statisticsWriter = statisticsWriter;

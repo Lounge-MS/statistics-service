@@ -6,6 +6,7 @@
         <RootNamespace>StatisticsServiceProject</RootNamespace>
     </PropertyGroup>
     <ItemGroup>
+      <PackageReference Include="DotNetEnv" />
       <PackageReference Include="FluentMigrator" />
       <PackageReference Include="FluentMigrator.Runner.Postgres" />
       <PackageReference Include="Google.Protobuf" />
@@ -21,5 +22,9 @@
     <ItemGroup>
         <Protobuf Include="Protos\*.proto" GrpcServices="Server" />
         <Protobuf Include="Protos\Kafka\*.proto" GrpcServices="None" />
+    </ItemGroup>
+    <ItemGroup>
+        <None Include="example.env" CopyToOutputDirectory="PreserveNewest" />
+        <None Include="appsettings.json" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 </Project>

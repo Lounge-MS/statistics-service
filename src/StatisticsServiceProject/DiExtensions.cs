@@ -1,9 +1,11 @@
+using FluentMigrator.Runner;
 using Itmo.Dev.Platform.Kafka.Extensions;
 using Npgsql;
 using OrderService;
 using StatisticsServiceProject.Domain.Ports.Repositories;
 using StatisticsServiceProject.Domain.Ports.Services;
 using StatisticsServiceProject.Domain.Services;
+using StatisticsServiceProject.Infrastructure.Driven.Postgres.Migrations;
 using StatisticsServiceProject.Infrastructure.Driven.Postgres.Repositories;
 using StatisticsServiceProject.Infrastructure.Driving.Grpc;
 using StatisticsServiceProject.Infrastructure.Driving.Kafka;
@@ -26,7 +28,7 @@ public static class DiExtensions
     {
         var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
         return serviceCollection
-            .AddSingleton(dataSourceBuilder)
+            .AddSingleton(dataSourceBuilder.Build())
             .AddScoped<IDataRepository, DataRepository>();
     }
 
@@ -43,12 +45,47 @@ public static class DiExtensions
                 .WithConfiguration(kafkaConsumerSection)
                 .DeserializeKeyWithNewtonsoft()
                 .DeserializeValueWithNewtonsoft()
-                .HandleWith<OrderPaidEventConsumerKafkaConsumerHandler>()));
+                .HandleWith<OrderPaidEventKafkaConsumerHandler>()));
+    }
+
+    public static IServiceCollection AddOrderPaidEventTestProducer(
+        this IServiceCollection serviceCollection,
+        IConfigurationSection kafkaSection,
+        IConfigurationSection kafkaConsumerSection)
+    {
+        return serviceCollection.AddPlatformKafka(builder => builder
+            .ConfigureOptions(kafkaSection)
+            .AddProducer(b => b
+                .WithKey<OrderSuccessfulKey>()
+                .WithValue<OrderSuccessfulValue>()
+                .WithConfiguration(kafkaConsumerSection)
+                .SerializeKeyWithNewtonsoft()
+                .SerializeValueWithNewtonsoft()));
     }
 
     public static void MapGrpcPresentation(
         this IEndpointRouteBuilder serviceProvider)
     {
         serviceProvider.MapGrpcService<GrpcStatisticsPresentation>();
+    }
+
+    public static IServiceCollection AddStatisticsServicePostgresMigrations(
+        this IServiceCollection serviceCollection,
+        string connectionString)
+    {
+        return serviceCollection
+            .AddFluentMigratorCore()
+            .ConfigureRunner(r => r
+                .AddPostgres()
+                .WithGlobalConnectionString(connectionString)
+                .ScanIn(typeof(CreateDataPointsTable).Assembly)
+                .For.Migrations());
+    }
+
+    public static void RunStatisticsServicePostgresMigrations(
+        this IServiceProvider serviceProvider)
+    {
+        IMigrationRunner runner = serviceProvider.GetRequiredService<IMigrationRunner>();
+        runner.MigrateUp();
     }
 }
