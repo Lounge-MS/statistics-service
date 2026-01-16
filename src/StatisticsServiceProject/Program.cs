@@ -1,8 +1,5 @@
 using DotNetEnv;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using StatisticsServiceProject;
-using StatisticsServiceProject.Infrastructure.Driving.Kafka;
 
 Env.Load("example.env");
 WebApplicationBuilder builder = WebApplication.CreateBuilder();
@@ -13,16 +10,8 @@ string postgresConnectionString =
     Environment.GetEnvironmentVariable("POSTGRES_CONNECTION_STRING")
     ?? throw new InvalidOperationException("No postgres connection string");
 
-JsonConvert.DefaultSettings = () => new JsonSerializerSettings
-{
-    ContractResolver = new DefaultContractResolver
-    {
-        NamingStrategy = new SnakeCaseNamingStrategy(),
-    },
-    NullValueHandling = NullValueHandling.Ignore,
-};
-
 builder.Services
+    .SetSnakeCaseEnumSerializing()
     .AddStatisticsServicePostgresMigrations(postgresConnectionString)
     .AddPostgresRepository(postgresConnectionString)
     .AddStatisticsService()

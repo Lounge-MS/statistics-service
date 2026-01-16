@@ -2,6 +2,7 @@ using FluentMigrator.Runner;
 using Itmo.Dev.Platform.Kafka.Extensions;
 using Npgsql;
 using OrderService;
+using StatisticsServiceProject.Domain.Entities.Dto.Repositories;
 using StatisticsServiceProject.Domain.Ports.Repositories;
 using StatisticsServiceProject.Domain.Ports.Services;
 using StatisticsServiceProject.Domain.Services;
@@ -9,6 +10,8 @@ using StatisticsServiceProject.Infrastructure.Driven.Postgres.Migrations;
 using StatisticsServiceProject.Infrastructure.Driven.Postgres.Repositories;
 using StatisticsServiceProject.Infrastructure.Driving.Grpc;
 using StatisticsServiceProject.Infrastructure.Driving.Kafka;
+using StatisticsServiceProject.Tools;
+using System.ComponentModel.DataAnnotations;
 
 namespace StatisticsServiceProject;
 
@@ -27,6 +30,8 @@ public static class DiExtensions
         string connectionString)
     {
         var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
+        dataSourceBuilder.MapEnum<DataType>();
+        dataSourceBuilder.MapEnum<Filter.FilterType>();
         return serviceCollection
             .AddSingleton(dataSourceBuilder.Build())
             .AddScoped<IDataRepository, DataRepository>();
@@ -72,5 +77,11 @@ public static class DiExtensions
     {
         IMigrationRunner runner = serviceProvider.GetRequiredService<IMigrationRunner>();
         runner.MigrateUp();
+    }
+
+    public static IServiceCollection SetSnakeCaseEnumSerializing(
+        this IServiceCollection serviceCollection)
+    {
+        return serviceCollection.AddSingleton<IEnumConverter, SnakeCaseEnumConverter>();
     }
 }

@@ -60,7 +60,11 @@ public class GrpcStatisticsPresentation : StatisticsService.StatisticsServiceBas
         return new GetProductSalesResponse
         {
             Data = (await _reader.GetProductSalesAsync(
-                request.ProductName,
+                string.IsNullOrWhiteSpace(request.ProductName)
+                    ? throw new RpcException(new Status(
+                        StatusCode.InvalidArgument,
+                        "No product name was provided"))
+                    : request.ProductName,
                 request.TimeRange.ToDomain(),
                 context.CancellationToken)).ToGrpc(),
         };

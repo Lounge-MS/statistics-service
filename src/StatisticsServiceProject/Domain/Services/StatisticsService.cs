@@ -2,6 +2,7 @@ using StatisticsServiceProject.Domain.Entities;
 using StatisticsServiceProject.Domain.Entities.Dto.Repositories;
 using StatisticsServiceProject.Domain.Ports.Repositories;
 using StatisticsServiceProject.Domain.Ports.Services;
+using StatisticsServiceProject.Tools;
 
 namespace StatisticsServiceProject.Domain.Services;
 
@@ -10,7 +11,8 @@ public class StatisticsService : IStatisticsReader, IStatisticsWriter
     private readonly IDataRepository _repository;
 
     public StatisticsService(
-        IDataRepository repository)
+        IDataRepository repository,
+        IEnumConverter enumConverter)
     {
         _repository = repository;
     }
@@ -63,7 +65,9 @@ public class StatisticsService : IStatisticsReader, IStatisticsWriter
             DataType.BoughtOrderPosition,
             DataRequestType.Sum,
             timeRange,
-            new Filter("productName", productName),
+            new Filter(
+                Filter.FilterType.ProductName,
+                productName),
             cancellationToken);
     }
 

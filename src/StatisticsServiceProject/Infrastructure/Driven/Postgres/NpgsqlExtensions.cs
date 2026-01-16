@@ -1,4 +1,5 @@
 using Npgsql;
+using NpgsqlTypes;
 using StatisticsServiceProject.Domain.Exceptions;
 
 namespace StatisticsServiceProject.Infrastructure.Driven.Postgres;
@@ -17,8 +18,14 @@ public static class NpgsqlExtensions
     public static NpgsqlParameter AddWithNullableValue(
         this NpgsqlParameterCollection collection,
         string key,
+        NpgsqlDbType dbType,
         object? value)
     {
-        return collection.AddWithValue(key, value ?? DBNull.Value);
+        if (value == null)
+        {
+            return collection.AddWithValue(key, dbType, DBNull.Value);
+        }
+
+        return collection.AddWithValue(key, dbType, value);
     }
 }

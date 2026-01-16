@@ -1,5 +1,11 @@
 namespace StatisticsServiceProject.Domain.Entities.Dto.Repositories;
 
 public record Filter(
-    string Key,
-    object Value);
+    Filter.FilterType Key,
+    object Value)
+{
+    public enum FilterType
+    {
+        ProductName,
+    }
+}

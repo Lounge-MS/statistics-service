@@ -4,17 +4,21 @@ using NpgsqlTypes;
 using StatisticsServiceProject.Domain.Entities;
 using StatisticsServiceProject.Domain.Entities.Dto.Repositories;
 using StatisticsServiceProject.Domain.Ports.Repositories;
+using StatisticsServiceProject.Tools;
 
 namespace StatisticsServiceProject.Infrastructure.Driven.Postgres.Repositories;
 
 public class DataRepository : IDataRepository
 {
     private readonly NpgsqlDataSource _dataSource;
+    private readonly IEnumConverter _enumConverter;
 
     public DataRepository(
-        NpgsqlDataSource dataSource)
+        NpgsqlDataSource dataSource,
+        IEnumConverter enumConverter)
     {
         _dataSource = dataSource;
+        _enumConverter = enumConverter;
     }
 
     public async Task AddDataAsync(
@@ -32,7 +36,7 @@ public class DataRepository : IDataRepository
             VALUES(:data_type, :value, :metainfo, :timestamp)
             """;
 
-        command.Parameters.AddWithValue("data_type", dataType.ToString());
+        command.Parameters.AddWithValue("data_type", _enumConverter.ConvertToString(dataType));
         command.Parameters.AddWithValue("value", value);
         command.Parameters.AddWithValue("metainfo", NpgsqlDbType.Jsonb, JsonConvert.SerializeObject(metainfo));
         command.Parameters.AddWithValue("timestamp", timestamp);
@@ -60,18 +64,22 @@ public class DataRepository : IDataRepository
             SELECT 
                 bucket_start,
                 bucket_start + @step::interval AS bucket_end,
-                AVG(
-                    COALESCE(
-                        (dp.metainfo->>'quantity')::double precision * dp.value,
-                        dp.value
-                    )
-                ) AS avg_value,
-                SUM(
-                    COALESCE(
-                        (dp.metainfo->>'quantity')::double precision * dp.value,
-                        dp.value
-                    )
-                ) AS sum_value
+                COALESCE(
+                    AVG(
+                        COALESCE(
+                            (dp.metainfo->>'quantity')::double precision * dp.value,
+                            dp.value
+                        )
+                    ), 0
+                ) as avg_value,
+                COALESCE(
+                    SUM(
+                        COALESCE(
+                            (dp.metainfo->>'quantity')::double precision * dp.value,
+                            dp.value
+                        )
+                    ), 0
+                ) as sum_value
             FROM intervals i
             LEFT JOIN data_points dp
                 ON dp.timestamp >= i.bucket_start
@@ -85,9 +93,17 @@ public class DataRepository : IDataRepository
         command.Parameters.AddWithValue("start", timeRange.StartTimestamp);
         command.Parameters.AddWithValue("end", timeRange.EndTimestamp);
         command.Parameters.AddWithValue("step", timeRange.StepTimespan);
-        command.Parameters.AddWithValue("data_type", dataType);
-        command.Parameters.AddWithNullableValue("filter_key", filter?.Key);
-        command.Parameters.AddWithNullableValue("filter_value", filter?.Value);
+        command.Parameters.AddWithValue("data_type", _enumConverter.ConvertToString(dataType));
+        if (filter != null)
+        {
+            command.Parameters.AddWithValue("filter_key", _enumConverter.ConvertToString(filter.Key));
+            command.Parameters.AddWithValue("filter_value", filter.Value);
+        }
+        else
+        {
+            command.Parameters.AddWithValue("filter_key", NpgsqlDbType.Varchar, DBNull.Value);
+            command.Parameters.AddWithValue("filter_value", NpgsqlDbType.Varchar, DBNull.Value);
+        }
 
         await using NpgsqlDataReader reader = await command.ExecuteReaderAsync(cancellationToken);
         var values = new List<double>();
