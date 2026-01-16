@@ -1,9 +1,10 @@
 using DotNetEnv;
 using StatisticsServiceProject;
 
-Env.Load("example.env");
+Env.Load(".env");
 WebApplicationBuilder builder = WebApplication.CreateBuilder();
 builder.Configuration.AddJsonFile("appsettings.json");
+builder.Configuration.AddEnvironmentVariables();
 IConfigurationSection kafkaSection = builder.Configuration.GetSection("Kafka");
 
 string postgresConnectionString =
