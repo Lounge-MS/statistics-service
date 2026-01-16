@@ -1,0 +1,105 @@
+services:
+  statistics-postgres:
+    container_name: statistics-postgres
+    image: postgres:latest
+    networks:
+      - statistics-network
+    ports:
+      - "9092:9092"
+      - "5431:5432"
+    environment:
+      POSTGRES_DB: "postgres"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+    volumes:
+      - statistics-pg-data:/data/postgres
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  statistics-zookeeper:
+    container_name: statistics-zookeeper
+    image: wurstmeister/zookeeper:latest
+    restart: unless-stopped
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    networks:
+      - statistics-network
+    
+  statistics-kafka:
+    container_name: statistics-kafka
+    image: wurstmeister/kafka:latest
+    restart: unless-stopped
+    environment:
+      KAFKA_LOG_DIRS: /kafka-data
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: statistics-zookeeper:2181
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_LISTENERS: EXTERNAL://:9092,INTERNAL://:9094
+      KAFKA_ADVERTISED_LISTENERS: EXTERNAL://127.0.0.1:8092,INTERNAL://statistics-kafka:9094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: EXTERNAL:PLAINTEXT,INTERNAL:PLAINTEXT
+      ALLOW_PLAINTEXT_LISTENER: yes
+      KAFKA_CREATE_TOPICS: >
+        OrderPaidEvent:1:1,
+    depends_on:
+      - statistics-zookeeper
+    networks:
+      - statistics-network
+    volumes:
+      - statistics-kafka-data:/kafka-data
+    ports:
+      - '8092:9092'
+
+  statistics-kafka-ui:
+    container_name: statistics-kafka-ui
+    image: provectuslabs/kafka-ui:latest
+    networks:
+      - statistics-network
+    build:
+      context: .
+    restart: unless-stopped
+    depends_on:
+      - statistics-kafka
+    ports:
+      - "8082:8080"
+    volumes:
+      - ./src/StatisticsServiceProject/Protos/Kafka:/schemas
+    environment:
+      kafka.clusters.0.name: statistics-kafka
+      kafka.clusters.0.bootstrapServers: statistics-kafka:9094
+      kafka.clusters.0.defaultKeySerde: ProtobufFile
+      kafka.clusters.0.defaultValueSerde: ProtobufFile
+
+      kafka.clusters.0.serde.0.name: ProtobufFile
+      kafka.clusters.0.serde.0.properties.protobufFilesDir: /schemas/
+
+      kafka.clusters.0.serde.0.properties.protobufMessageNameForKeyByTopic.OrderPaidEvent: order_service.OrderSuccessfulKey
+      kafka.clusters.0.serde.0.properties.protobufMessageNameForValueByTopic.OrderPaidEvent: order_service.OrderSuccessfulValue
+
+  statistics-service:
+    container_name: statistics-service
+    networks:
+      - statistics-network
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8100:8080"
+    depends_on:
+      statistics-postgres:
+        condition: service_healthy
+      statistics-kafka:
+        condition: service_started
+    environment:
+      POSTGRES_CONNECTION_STRING: "Host=statistics-postgres;Port=5432;Database=postgres;Username=postgres;Password=postgres"
+      Kafka__Host: "statistics-kafka:9094"
+
+networks:
+  statistics-network:
+    driver: bridge
+
+volumes:
+  statistics-kafka-data:
+  statistics-pg-data:
