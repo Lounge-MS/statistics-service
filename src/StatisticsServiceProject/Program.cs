@@ -26,9 +26,6 @@ builder.Services
     .AddStatisticsServicePostgresMigrations(postgresConnectionString)
     .AddPostgresRepository(postgresConnectionString)
     .AddStatisticsService()
-    .AddOrderPaidEventTestProducer(
-        kafkaSection,
-        kafkaSection.GetSection("OrderPaidEventConsumer"))
     .AddOrderPaidEventKafkaConsumer(
         kafkaSection,
         kafkaSection.GetSection("OrderPaidEventConsumer"))

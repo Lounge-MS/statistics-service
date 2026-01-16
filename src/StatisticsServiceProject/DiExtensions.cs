@@ -48,21 +48,6 @@ public static class DiExtensions
                 .HandleWith<OrderPaidEventKafkaConsumerHandler>()));
     }
 
-    public static IServiceCollection AddOrderPaidEventTestProducer(
-        this IServiceCollection serviceCollection,
-        IConfigurationSection kafkaSection,
-        IConfigurationSection kafkaConsumerSection)
-    {
-        return serviceCollection.AddPlatformKafka(builder => builder
-            .ConfigureOptions(kafkaSection)
-            .AddProducer(b => b
-                .WithKey<OrderSuccessfulKey>()
-                .WithValue<OrderSuccessfulValue>()
-                .WithConfiguration(kafkaConsumerSection)
-                .SerializeKeyWithNewtonsoft()
-                .SerializeValueWithNewtonsoft()));
-    }
-
     public static void MapGrpcPresentation(
         this IEndpointRouteBuilder serviceProvider)
     {
