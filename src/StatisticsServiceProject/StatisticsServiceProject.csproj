@@ -19,7 +19,7 @@
       <PackageReference Include="Npgsql" />
     </ItemGroup>
     <ItemGroup>
-        <Protobuf Include="Infrastructure\Driving\Kafka\Protos\*.proto" GrpcServices="None" />
-        <Protobuf Include="Infrastructure\Driving\Grpc\Protos\*.proto" GrpcServices="Server" />
+        <Protobuf Include="Protos\*.proto" GrpcServices="Server" />
+        <Protobuf Include="Protos\Kafka\*.proto" GrpcServices="None" />
     </ItemGroup>
 </Project>

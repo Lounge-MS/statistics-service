@@ -1,5 +1,6 @@
 using Itmo.Dev.Platform.Kafka.Extensions;
 using Npgsql;
+using OrderService;
 using StatisticsServiceProject.Domain.Ports.Repositories;
 using StatisticsServiceProject.Domain.Ports.Services;
 using StatisticsServiceProject.Domain.Services;
@@ -29,7 +30,7 @@ public static class DiExtensions
             .AddScoped<IDataRepository, DataRepository>();
     }
 
-    public static IServiceCollection AddOrderServiceKafkaConsumer(
+    public static IServiceCollection AddOrderPaidEventKafkaConsumer(
         this IServiceCollection serviceCollection,
         IConfigurationSection kafkaSection,
         IConfigurationSection kafkaConsumerSection)
@@ -42,7 +43,7 @@ public static class DiExtensions
                 .WithConfiguration(kafkaConsumerSection)
                 .DeserializeKeyWithNewtonsoft()
                 .DeserializeValueWithNewtonsoft()
-                .HandleWith<OrderServiceKafkaConsumerHandler>()));
+                .HandleWith<OrderPaidEventConsumerKafkaConsumerHandler>()));
     }
 
     public static void MapGrpcPresentation(

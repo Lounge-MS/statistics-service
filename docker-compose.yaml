@@ -57,7 +57,7 @@ services:
     ports:
       - "8082:8080"
     volumes:
-      - ./src/statisticsingServiceProject/Protos:/schemas
+      - ./src/StatisticsServiceProject/Protos/Kafka:/schemas
     environment:
       kafka.clusters.0.name: statistics-kafka
       kafka.clusters.0.bootstrapServers: statistics-kafka:9092
@@ -67,8 +67,8 @@ services:
       kafka.clusters.0.serde.0.name: ProtobufFile
       kafka.clusters.0.serde.0.properties.protobufFilesDir: /schemas/
 
-      kafka.clusters.0.serde.0.properties.protobufMessageNameForKeyByTopic.CheckClosedEvent: grpc_statisticsing_service.kafka.ClosedCheckKey
-      kafka.clusters.0.serde.0.properties.protobufMessageNameForValueByTopic.CheckClosedEvent: grpc_statisticsing_service.kafka.ClosedCheckValue
+      kafka.clusters.0.serde.0.properties.protobufMessageNameForKeyByTopic.OrderPaidEvent: order_service.OrderSuccessfulKey
+      kafka.clusters.0.serde.0.properties.protobufMessageNameForValueByTopic.OrderPaidEvent: order_service.OrderSuccessfulValue
 
 networks:
   statistics-network:

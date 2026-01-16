@@ -1,14 +1,16 @@
 using Itmo.Dev.Platform.Kafka.Consumer;
+using OrderService;
 using StatisticsServiceProject.Domain.Entities;
 using StatisticsServiceProject.Domain.Ports.Services;
 
 namespace StatisticsServiceProject.Infrastructure.Driving.Kafka;
 
-public class OrderServiceKafkaConsumerHandler : IKafkaConsumerHandler<OrderSuccessfulKey, OrderSuccessfulValue>
+public class OrderPaidEventConsumerKafkaConsumerHandler
+    : IKafkaConsumerHandler<OrderSuccessfulKey, OrderSuccessfulValue>
 {
     private readonly IStatisticsWriter _statisticsWriter;
 
-    public OrderServiceKafkaConsumerHandler(
+    public OrderPaidEventConsumerKafkaConsumerHandler(
         IStatisticsWriter statisticsWriter)
     {
         _statisticsWriter = statisticsWriter;

@@ -8,7 +8,7 @@ builder.Services
         Environment.GetEnvironmentVariable("POSTGRES_CONNECTION_STRING")
         ?? throw new InvalidOperationException("No postgres connection string"))
     .AddStatisticsService()
-    .AddOrderServiceKafkaConsumer(
+    .AddOrderPaidEventKafkaConsumer(
         kafkaSection,
         kafkaSection.GetSection("OrderServiceConsumer"))
     .AddGrpc();
