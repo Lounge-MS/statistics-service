@@ -6,4 +6,5 @@ public enum DataType
     BoughtOrderPosition,
     PointsSpending,
     Expense,
+    UserRegister,
 }

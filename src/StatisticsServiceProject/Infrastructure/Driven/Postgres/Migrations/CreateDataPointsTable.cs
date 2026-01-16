@@ -23,8 +23,8 @@ public class CreateDataPointsTable : Migration
             CREATE INDEX idx_data_points_data_type
                 ON data_points (data_type);
 
-            CREATE INDEX idx_data_points_product_id
-                ON data_points (((metainfo->>'product_id')::bigint));
+            CREATE INDEX idx_data_points_product_name
+                ON data_points (((metainfo->>'productName')::bigint));
 
             CREATE INDEX idx_data_points_metainfo_gin
                 ON data_points USING gin (metainfo);

@@ -6,13 +6,20 @@
         <RootNamespace>StatisticsServiceProject</RootNamespace>
     </PropertyGroup>
     <ItemGroup>
-      <Folder Include="Infrastructure\Driving\Grpc\Controllers\" />
-      <Folder Include="Infrastructure\Driving\Kafka\" />
-      <Folder Include="Protos\" />
-    </ItemGroup>
-    <ItemGroup>
       <PackageReference Include="FluentMigrator" />
       <PackageReference Include="FluentMigrator.Runner.Postgres" />
+      <PackageReference Include="Google.Protobuf" />
+      <PackageReference Include="Grpc.AspNetCore" />
+      <PackageReference Include="Grpc.Core" />
+      <PackageReference Include="Grpc.Tools">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+      <PackageReference Include="Itmo.Dev.Platform.Kafka" />
       <PackageReference Include="Npgsql" />
+    </ItemGroup>
+    <ItemGroup>
+        <Protobuf Include="Infrastructure\Driving\Kafka\Protos\*.proto" GrpcServices="None" />
+        <Protobuf Include="Infrastructure\Driving\Grpc\Protos\*.proto" GrpcServices="Server" />
     </ItemGroup>
 </Project>

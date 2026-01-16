@@ -17,7 +17,7 @@ public class StatisticsService : IStatisticsReader, IStatisticsWriter
 
     public Task AddDataAsync(
         double data,
-        string? metainfo,
+        object? metainfo,
         DataType dataType,
         DateTime timestamp,
         CancellationToken cancellationToken = default)
@@ -25,67 +25,56 @@ public class StatisticsService : IStatisticsReader, IStatisticsWriter
         return _repository.AddDataAsync(dataType, data, metainfo, timestamp, cancellationToken);
     }
 
+    public Task AddExpenseAsync(decimal amount, DateTime timestamp, CancellationToken cancellationToken = default)
+    {
+        return AddDataAsync((double)amount, null, DataType.Expense, timestamp, cancellationToken);
+    }
+
     public Task<DataPoints> GetAverageReceiptAsync(
-        DateTime startTimestamp,
-        DateTime endTimestamp,
-        TimeSpan stepTimespan,
+        TimeRange timeRange,
         CancellationToken cancellationToken = default)
     {
         return _repository.GetDataAsync(
             DataType.ClosedOrder,
             DataRequestType.Avg,
-            startTimestamp,
-            endTimestamp,
-            stepTimespan,
+            timeRange,
             null,
             cancellationToken);
     }
 
     public Task<DataPoints> GetDepositsAsync(
-        DateTime startTimestamp,
-        DateTime endTimestamp,
-        TimeSpan stepTimespan,
+        TimeRange timeRange,
         CancellationToken cancellationToken = default)
     {
         return _repository.GetDataAsync(
             DataType.ClosedOrder,
             DataRequestType.Sum,
-            startTimestamp,
-            endTimestamp,
-            stepTimespan,
+            timeRange,
             null,
             cancellationToken);
     }
 
     public Task<DataPoints> GetProductSalesAsync(
-        long productId,
-        DateTime startTimestamp,
-        DateTime endTimestamp,
-        TimeSpan stepTimespan,
+        string productName,
+        TimeRange timeRange,
         CancellationToken cancellationToken = default)
     {
         return _repository.GetDataAsync(
             DataType.BoughtOrderPosition,
             DataRequestType.Sum,
-            startTimestamp,
-            endTimestamp,
-            stepTimespan,
-            new Filter("product_id", productId),
+            timeRange,
+            new Filter("productName", productName),
             cancellationToken);
     }
 
     public Task<DataPoints> GetExpensesAsync(
-        DateTime startTimestamp,
-        DateTime endTimestamp,
-        TimeSpan stepTimespan,
+        TimeRange timeRange,
         CancellationToken cancellationToken = default)
     {
         return _repository.GetDataAsync(
             DataType.Expense,
             DataRequestType.Sum,
-            startTimestamp,
-            endTimestamp,
-            stepTimespan,
+            timeRange,
             null,
             cancellationToken);
     }

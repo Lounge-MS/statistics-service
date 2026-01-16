@@ -1,4 +1,6 @@
+using Newtonsoft.Json;
 using Npgsql;
+using NpgsqlTypes;
 using StatisticsServiceProject.Domain.Entities;
 using StatisticsServiceProject.Domain.Entities.Dto.Repositories;
 using StatisticsServiceProject.Domain.Ports.Repositories;
@@ -18,7 +20,7 @@ public class DataRepository : IDataRepository
     public async Task AddDataAsync(
         DataType dataType,
         double value,
-        string? metainfo,
+        object? metainfo,
         DateTime timestamp,
         CancellationToken cancellationToken = default)
     {
@@ -32,7 +34,7 @@ public class DataRepository : IDataRepository
 
         command.Parameters.AddWithValue("data_type", dataType);
         command.Parameters.AddWithValue("value", value);
-        command.Parameters.AddWithValue("metainfo", metainfo ?? "{}");
+        command.Parameters.AddWithValue("metainfo", NpgsqlDbType.Jsonb, JsonConvert.SerializeObject(metainfo));
         command.Parameters.AddWithValue("timestamp", timestamp);
 
         await command.ExecuteNonQueryAsync(cancellationToken);
@@ -41,9 +43,7 @@ public class DataRepository : IDataRepository
     public async Task<DataPoints> GetDataAsync(
         DataType dataType,
         DataRequestType dataRequestType,
-        DateTime startTimestamp,
-        DateTime endTimestamp,
-        TimeSpan stepTimespan,
+        TimeRange timeRange,
         Filter? filter = null,
         CancellationToken cancellationToken = default)
     {
@@ -82,9 +82,9 @@ public class DataRepository : IDataRepository
             ORDER BY bucket_start;
             """;
 
-        command.Parameters.AddWithValue("start", startTimestamp);
-        command.Parameters.AddWithValue("end", endTimestamp);
-        command.Parameters.AddWithValue("step", stepTimespan);
+        command.Parameters.AddWithValue("start", timeRange.StartTimestamp);
+        command.Parameters.AddWithValue("end", timeRange.EndTimestamp);
+        command.Parameters.AddWithValue("step", timeRange.StepTimespan);
         command.Parameters.AddWithValue("data_type", dataType);
         command.Parameters.AddWithNullableValue("filter_key", filter?.Key);
         command.Parameters.AddWithNullableValue("filter_value", filter?.Value);
@@ -103,10 +103,6 @@ public class DataRepository : IDataRepository
             values.Add(value);
         }
 
-        return new DataPoints(
-            values,
-            startTimestamp,
-            endTimestamp,
-            stepTimespan);
+        return new DataPoints(values, timeRange);
     }
 }

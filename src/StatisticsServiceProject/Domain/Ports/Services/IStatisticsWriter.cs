@@ -6,8 +6,13 @@ public interface IStatisticsWriter
 {
     Task AddDataAsync(
         double data,
-        string? metainfo,
+        object? metainfo,
         DataType dataType,
+        DateTime timestamp,
+        CancellationToken cancellationToken = default);
+
+    Task AddExpenseAsync(
+        decimal amount,
         DateTime timestamp,
         CancellationToken cancellationToken = default);
 }

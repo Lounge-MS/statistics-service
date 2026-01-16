@@ -8,16 +8,14 @@ public interface IDataRepository
     Task AddDataAsync(
         DataType dataType,
         double value,
-        string? metainfo,
+        object? metainfo,
         DateTime timestamp,
         CancellationToken cancellationToken = default);
 
     Task<DataPoints> GetDataAsync(
         DataType dataType,
         DataRequestType dataRequestType,
-        DateTime startTimestamp,
-        DateTime endTimestamp,
-        TimeSpan stepTimespan,
+        TimeRange timeRange,
         Filter? filter = null,
         CancellationToken cancellationToken = default);
 }
